@@ -21,4 +21,5 @@ export class RentalsController {
   returnRental(@Req() req: any, @Param('id', ParseIntPipe) id: number) {
     return this.service.returnRental(req.user.sub, id);
   }
+}
 
