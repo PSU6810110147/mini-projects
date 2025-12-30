@@ -30,4 +30,4 @@ export class Rental {
   @ManyToOne(() => Movie, (m) => m.rentals, { eager: true })
   @JoinColumn({ name: 'movieId' })
   movie: Movie;
-}
+
