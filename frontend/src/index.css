@@ -1,0 +1,22 @@
+/* reset ทั้งหน้า */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* html + body เต็มจอ */
+html,
+body {
+  width: 100%;
+  height: 100%;
+  background: #020617; /* ดำเข้ม */
+  overflow: hidden;
+}
+
+/* root ของ React */
+#root {
+  width: 100%;
+  height: 100%;
+  background: #020617;
+}
