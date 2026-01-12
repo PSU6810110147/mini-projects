@@ -4,47 +4,56 @@ export const movies = [
     title: "Black Panther",
     year: 2018,
     rating: 8.0,
-    category: "Movies",
+    type: "Movies",
     genre: "Action",
-    poster: "https://image.tmdb.org/t/p/w500/uxzzxijgPIY7slzFvMotPv8wjKA.jpg",
-    desc: "The king of Wakanda rises."
+    poster: "https://image.tmdb.org/t/p/w500/uxzzxijgPIY7slzFvMotPv8wjKA.jpg", // ของเดิมคุณ
+    overview: "T’Challa returns home as king of Wakanda but finds his sovereignty challenged.", // ของเดิมคุณ
+    trailerUrl: "https://youtu.be/xjDjIWPwcPU?si=obq6EdHiCiMvS5CX",
   },
   {
     id: 2,
     title: "Pirates of the Caribbean",
     year: 2007,
     rating: 8.2,
-    category: "Movies",
+    type: "Movies",
     genre: "Adventure",
     poster: "https://m.media-amazon.com/images/I/71zji3aER6L._AC_SL1055_.jpg",
-    desc: "A swashbuckling adventure on the high seas."
+    overview: "Captain Jack Sparrow joins forces to face the legendary Davy Jones.",
+    trailerUrl: "https://youtu.be/naQr0uTrH_s?si=pUbT44FYl4BBon-M",
   },
   {
     id: 3,
     title: "Money Heist",
     year: 2017,
     rating: 8.7,
-    category: "Series",
+    type: "Series",
     genre: "Crime",
     poster: "https://image.tmdb.org/t/p/w500/reEMJA1uzscCbkpeRJeTT2bjqUp.jpg",
-    desc: "A mastermind leads a heist."
+    overview: "A criminal mastermind plans the biggest heist in history.",
+    trailerUrl: "https://youtu.be/_InqQJRqGW4?si=ZiCIIAT6jfjOK074",
   },
   {
     id: 4,
     title: "The Last of Us",
     year: 2023,
     rating: 9.2,
-    category: "Series",
+    type: "Series",
     genre: "Drama",
     poster: "https://image.tmdb.org/t/p/w500/uKvVjHNqB5VmOrdxqAt2F7J78ED.jpg",
-    desc: "Survival in a post-apocalyptic world."
-  }
-];
+    overview: "A smuggler escorts a girl across a post-apocalyptic world.",
+    trailerUrl: "https://youtu.be/uLtkt8BonwM?si=WfooAlxfqkW6NRBT",
+  },
+  {
+    id: 5,
+    title: "Uncharted",
+    year: 2022,
+    rating: 7.4,
+    type: "Movies",
+    genre: "Adventure",
+    poster: "https://image.tmdb.org/t/p/w500/tlZpSxYuBRoVJBOpUrPdQe9FmFq.jpg",
+    overview: "Treasure hunter Nathan Drake is recruited for a dangerous adventure.",
+    trailerUrl: "https://youtu.be/eHp3MbsCbMg?si=QscQHYeAs-bl5QgT",
+  },
 
-export const categories = ["All", "Movies", "Series"];
-
-export const rows = [
-  { key: "trending", title: "แนะนำ / Trending", filter: (m) => m.rating >= 8.0 },
-  { key: "movies", title: "ภาพยนตร์ยอดนิยม", filter: (m) => m.category === "Movies" },
-  { key: "series", title: "ซีรีส์แนะนำ", filter: (m) => m.category === "Series" }
+  // เรื่องอื่น ๆ ของคุณใส่ trailerUrl เพิ่มได้เรื่อย ๆ
 ];

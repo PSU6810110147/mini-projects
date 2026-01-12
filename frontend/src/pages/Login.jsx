@@ -1,56 +1,64 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import logo from "../assets/logo.png";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const [email, setEmail] = useState("test@example.com");
-  const [password, setPassword] = useState("123456");
-  const nav = useNavigate();
+  const navigate = useNavigate();
   const location = useLocation();
 
-  const onSubmit = (e) => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const from = location.state?.from?.pathname || "/home";
+
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    // ✅ demo login (คุณจะต่อ backend ทีหลังก็ได้)
-    if (email && password) {
-      localStorage.setItem("token", "demo-token");
-      const to = location.state?.from || "/home";
-      nav(to, { replace: true });
+    if (username === "admin" && password === "1234") {
+      localStorage.setItem("token", "logged-in");
+      navigate(from, { replace: true }); // ✅ กลับไปหน้าที่ตั้งใจ
+    } else {
+      setError("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
     }
   };
 
   return (
-    <div className="loginWrap">
-      <div className="loginCard">
-        <h1 className="loginTitle">
-          <img src={logo} alt="Mini-Project-Movie" style={{ width: 28, height: 28, objectFit: "contain" }} />
-          Login
-        </h1>
-        <p className="loginSub">Sign in to continue</p>
+    <div className="loginPage">
+      <form className="loginCard" onSubmit={handleSubmit}>
+        <h2>เข้าสู่ระบบ</h2>
 
-        <form onSubmit={onSubmit}>
-          <label className="fieldLabel">Email</label>
+        {error && <p className="loginError">{error}</p>}
+
+        <div className="loginField">
+          <label>Username</label>
           <input
-            className="input"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
+            type="text"
+            placeholder="กรอกชื่อผู้ใช้"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
           />
+        </div>
 
-          <label className="fieldLabel">Password</label>
+        <div className="loginField">
+          <label>Password</label>
           <input
-            className="input"
             type="password"
+            placeholder="กรอกรหัสผ่าน"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
+            required
           />
+        </div>
 
-          <button className="loginBtn" type="submit">Sign in</button>
-        </form>
+        <button type="submit" className="loginBtn">
+          Login
+        </button>
 
-        <div className="demoText">Demo: test@example.com / 123456</div>
-      </div>
+        <p className="loginHint">
+          * ตัวอย่าง: <b>admin / 1234</b>
+        </p>
+      </form>
     </div>
   );
 }

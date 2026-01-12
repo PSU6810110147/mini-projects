@@ -4,8 +4,10 @@ export default function ProtectedRoute() {
   const token = localStorage.getItem("token");
   const location = useLocation();
 
+  // ถ้าไม่ login -> เด้งไป login และจำ path เดิมไว้
   if (!token) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
+
   return <Outlet />;
 }

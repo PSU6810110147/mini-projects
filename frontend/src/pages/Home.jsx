@@ -1,77 +1,82 @@
-import { Link, useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
-import { movies, categories, rows } from "../data/movies";
-import CarouselRow from "../components/CarouselRow";
-import logo from "../assets/logo.png";
+import { useNavigate } from "react-router-dom";
+import { movies } from "../data/movies";
+import Carousel from "../components/Carousel";
 
-export default function Home() {
-  const [cat, setCat] = useState("All");
-  const nav = useNavigate();
+export default function Home({ mode }) {
+  const navigate = useNavigate();
+  const [tab, setTab] = useState("All");
 
-  const isLoggedIn = !!localStorage.getItem("token");
-
+  // ================= รายการทั่วไป =================
   const filtered = useMemo(() => {
-    return cat === "All" ? movies : movies.filter((m) => m.category === cat);
-  }, [cat]);
+    let list = [...movies];
+
+    if (tab !== "All") {
+      list = list.filter((m) => m.type === tab);
+    }
+
+    if (mode === "home") {
+      list = list.slice(0, 10);
+    }
+
+    return list;
+  }, [tab, mode]);
+
+  // ================= Trending (⭐ > 8.5) =================
+  const trending = useMemo(() => {
+    let list = [...movies];
+
+    if (tab !== "All") {
+      list = list.filter((m) => m.type === tab);
+    }
+
+    list = list.filter((m) => m.rating > 8.5);
+    list.sort((a, b) => b.rating - a.rating);
+
+    return list;
+  }, [tab]);
 
   return (
-    <>
-      <header className="nav">
-        <div className="container navInner">
-          <Link to="/home" className="brand">
-            <img src={logo} alt="Mini-Project-Movie" className="brandLogo" />
-            <div>Mini-Project-Movie</div>
-          </Link>
-
-          <nav className="menu">
-            <Link to="/home">หน้าแรก</Link>
-            <Link to="/movies">ทั้งหมด</Link>
-          </nav>
-
-          {isLoggedIn ? (
-            <button
-              className="btnGhost"
-              onClick={() => {
-                localStorage.removeItem("token");
-                nav("/login", { replace: true });
-              }}
-            >
-              ออกจากระบบ
-            </button>
-          ) : (
-            <button className="btn" onClick={() => nav("/login")}>เข้าสู่ระบบ</button>
-          )}
-        </div>
-      </header>
-
-      <main className="container" style={{ paddingTop: 16 }}>
-        <h1 style={{ margin: "10px 0 6px" }}>Home (Movies)</h1>
-        <p style={{ margin: 0, color: "rgba(255,255,255,.65)", fontWeight: 800 }}>
-          มีหมวดหมู่ + carousel + โปสเตอร์ + หน้า detail
+    <main className="container">
+      {/* ================= HERO ================= */}
+      <div className="heroCard">
+        <h1>Home (Movies)</h1>
+        <p className="muted">
+          มีหมวดหมู่ + carousel + โปสเตอร์เท่ากัน + หน้า detail
         </p>
 
         <div className="tabs">
-          {categories.map((c) => (
+          {["All", "Movies", "Series"].map((t) => (
             <button
-              key={c}
-              className={`tab ${cat === c ? "tabActive" : ""}`}
-              onClick={() => setCat(c)}
+              key={t}
+              className={tab === t ? "active" : ""}
+              onClick={() => setTab(t)}
             >
-              {c}
+              {t}
             </button>
           ))}
+
+          {/* 👉 ไปหน้าทั้งหมด */}
+          <button className="ghostBtn" onClick={() => navigate("/movies")}>
+            ไปหน้าทั้งหมด →
+          </button>
         </div>
+      </div>
 
-        {rows.map((r) => (
-          <CarouselRow
-            key={r.key}
-            title={r.title}
-            items={filtered.filter(r.filter)}
-          />
-        ))}
+      {/* ================= TRENDING ================= */}
+      {trending.length > 0 && (
+        <section className="section">
+          <h2 className="sectionTitle">แนะนำ / Trending</h2>
+          <Carousel items={trending} />
+        </section>
+      )}
 
-        <div className="footer">© Mini-Project-Movie</div>
-      </main>
-    </>
+      {/* ================= LIST ================= */}
+      <section className="section">
+        <h2 className="sectionTitle">รายการ</h2>
+        <p className="muted">คลิกที่การ์ดเพื่อดูรายละเอียด</p>
+        <Carousel items={filtered} />
+      </section>
+    </main>
   );
 }
