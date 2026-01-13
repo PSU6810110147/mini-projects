@@ -1,5 +1,7 @@
+import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { movies } from "../data/movies";
+import { useRentals } from "../contexts/RentalsContext";
 
 function toYoutubeEmbed(url) {
   if (!url) return "";
@@ -8,87 +10,185 @@ function toYoutubeEmbed(url) {
 
     // youtu.be/VIDEO_ID
     if (u.hostname.includes("youtu.be")) {
-      const videoId = u.pathname.replace("/", "");
-      return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
+      const id = u.pathname.replace("/", "");
+      return id ? `https://www.youtube.com/embed/${id}` : "";
     }
 
     // youtube.com/watch?v=VIDEO_ID
-    const v = u.searchParams.get("v");
-    if (v) return `https://www.youtube.com/embed/${v}`;
+    if (u.hostname.includes("youtube.com")) {
+      // already embed
+      if (u.pathname.startsWith("/embed/")) return url;
 
-    return "";
+      const id = u.searchParams.get("v");
+      if (id) return `https://www.youtube.com/embed/${id}`;
+
+      // shorts
+      if (u.pathname.startsWith("/shorts/")) {
+        const sid = u.pathname.split("/shorts/")[1]?.split("?")[0];
+        return sid ? `https://www.youtube.com/embed/${sid}` : "";
+      }
+    }
+
+    return url;
   } catch {
-    return "";
+    // fallback simple replace
+    return url.includes("watch?v=") ? url.replace("watch?v=", "embed/") : url;
   }
 }
 
 export default function Detail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const m = movies.find((x) => String(x.id) === String(id));
+  const { rent, cancel, isRented } = useRentals();
 
-  if (!m) {
+  const movie = useMemo(() => movies.find((m) => String(m.id) === id), [id]);
+
+  if (!movie) {
     return (
-      <div className="container">
-        <h2>ไม่พบรายการ</h2>
-        <button className="btn" onClick={() => navigate("/home")}>กลับหน้าแรก</button>
-      </div>
+      <main className="container">
+        <div className="glassCard">
+          <h2 style={{ margin: 0 }}>ไม่พบข้อมูล</h2>
+          <p className="muted" style={{ marginTop: 8 }}>
+            ไม่เจอหนังรหัส: {id}
+          </p>
+          <button type="button" className="btn big" onClick={() => navigate(-1)}>
+            ⬅ ย้อนกลับ
+          </button>
+        </div>
+      </main>
     );
   }
 
-  // ✅ รองรับทั้ง trailerUrl (ใน movies.js ของคุณ) และ trailer (เผื่อยังใช้ชื่อเก่า)
-  const trailerUrl = m.trailerUrl || m.trailer || "";
-  const trailerEmbed = toYoutubeEmbed(trailerUrl);
+  const rented = isRented(movie.id);
+  const trailerEmbed = toYoutubeEmbed(movie.trailerUrl);
+
+  const handleRent = () => rent(movie.id);
+  const handleCancel = () => cancel(movie.id);
 
   return (
-    <div className="container">
-      <div className="detailGrid">
-        {/* LEFT */}
-        <div className="detailLeft">
-          <img className="detailPoster" src={m.poster} alt={m.title} />
-          <h1>{m.title}</h1>
-          <p className="muted">
-            {m.year} • ⭐ {m.rating} • {m.type} • {m.genre}
-          </p>
-          <p className="detailOverview">{m.overview}</p>
-
-          <div className="detailActions">
-            <button className="btn primary">เช่าหนัง</button>
-            <button className="btn ghost" onClick={() => navigate(-1)}>ย้อนกลับ</button>
+    <main className="container">
+      {/* mini header + logo */}
+      <div className="detailTopBar">
+        <div className="detailBrand" onClick={() => navigate("/home")} role="button" tabIndex={0}>
+          <span className="detailBrandLogo" aria-hidden="true">🎬</span>
+          <div className="detailBrandText">
+            <div className="detailBrandTitle">Mini-Project-Movie</div>
+            <div className="detailBrandSub muted">Movie detail</div>
           </div>
         </div>
 
-        {/* RIGHT */}
-        <div className="detailRight">
-          <div className="trailerHeader">
-            <h3 className="trailerTitle">ตัวอย่างหนัง</h3>
+        <button type="button" className="btn" onClick={() => navigate(-1)}>
+          ⬅ ย้อนกลับ
+        </button>
+      </div>
 
-            {trailerUrl ? (
+      <div className="detailGrid">
+        {/* LEFT */}
+        <section className="detailLeft">
+          <div className="detailPosterWrap">
+            <img src={movie.poster} alt={movie.title} className="detailPoster" />
+            {rented && <div className="detailRentedBadge">RENTED</div>}
+          </div>
+
+          <div className="detailInfoCard">
+            <h1 className="detailTitle">{movie.title}</h1>
+
+            {/* stats */}
+            <div className="detailStats">
+              <div className="stat">
+                <div className="statLabel">Type</div>
+                <div className="statValue">{movie.type}</div>
+              </div>
+              <div className="stat">
+                <div className="statLabel">Year</div>
+                <div className="statValue">{movie.year}</div>
+              </div>
+              <div className="stat">
+                <div className="statLabel">Rating</div>
+                <div className="statValue">⭐ {movie.rating}</div>
+              </div>
+            </div>
+
+            {/* overview */}
+            <div className="detailOverviewCard">
+              <div className="detailSectionLabel">คำอธิบาย</div>
+              <p className="detailOverview">
+                {movie.overview || "ยังไม่มีคำอธิบาย"}
+              </p>
+            </div>
+
+            {/* actions */}
+            <div className="detailActionsBar">
+              {!rented ? (
+                <button
+                  type="button"
+                  className="btn primary big"
+                  onClick={handleRent}
+                >
+                  🎬 เช่า
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="btn danger big"
+                  onClick={handleCancel}
+                >
+                  ❌ ยกเลิกการเช่า
+                </button>
+              )}
+
+              <button
+                type="button"
+                className="btn big"
+                onClick={() => navigate("/library")}
+              >
+                📚 ไปคลังของฉัน
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* RIGHT */}
+        <section className="detailRight">
+          <div className="detailTrailerHead">
+            <h3 className="detailTrailerTitle">ตัวอย่างหนัง</h3>
+
+            {movie.trailerUrl ? (
               <a
-                className="btn ghost trailerBtn"
-                href={trailerUrl}
+                className="btn trailerLinkBtn"
+                href={movie.trailerUrl}
                 target="_blank"
                 rel="noreferrer"
               >
-                เปิดใน YouTube
+                เปิดบน YouTube ↗
               </a>
-            ) : null}
+            ) : (
+              <span className="muted" style={{ fontSize: 13 }}>
+                ไม่มีลิงก์ตัวอย่าง
+              </span>
+            )}
           </div>
 
-          {trailerEmbed ? (
-            <div className="trailerBox">
+          <div className="trailerBox">
+            {trailerEmbed ? (
               <iframe
-                src={trailerEmbed}
-                title="Movie Trailer"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                className="trailerFrame"
+                src={`${trailerEmbed}?rel=0&modestbranding=1`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
+                title="trailer"
               />
-            </div>
-          ) : (
-            <p className="muted">ไม่มีตัวอย่างหนัง</p>
-          )}
-        </div>
+            ) : (
+              <div className="trailerEmpty">
+                <div className="trailerEmptyIcon">🎞️</div>
+                <div className="trailerEmptyText">
+                  ยังไม่มีตัวอย่างหนังสำหรับเรื่องนี้
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }

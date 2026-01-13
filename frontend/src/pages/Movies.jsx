@@ -1,65 +1,54 @@
-import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { movies } from "../data/movies";
+import { useRentals } from "../contexts/RentalsContext";
 
 export default function Movies() {
-  const [tab, setTab] = useState("All");
   const navigate = useNavigate();
-
-  const list = useMemo(() => {
-    if (tab === "All") return movies;
-    return movies.filter((m) => m.type === tab);
-  }, [tab]);
+  const { isRented, rent } = useRentals();
 
   return (
     <main className="container">
-      <div className="pageHeader">
-        <div>
-          <h1 className="pageTitle">ทั้งหมด</h1>
-          <p className="pageSub">คลิกการ์ดเพื่อเข้าหน้า Detail</p>
-        </div>
+      <h1 style={{ marginBottom: 16 }}>หนังทั้งหมด</h1>
 
-        <div className="tabs">
-          {["All", "Movies", "Series"].map((t) => (
-            <button
-              key={t}
-              className={tab === t ? "active" : ""}
-              onClick={() => setTab(t)}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
+      <div className="grid">
+        {movies.map((m) => {
+          const rented = isRented(m.id);
+
+          return (
+            <div key={m.id} className="card">
+              <div className="posterWrap" onClick={() => navigate(`/movie/${m.id}`)}>
+                <img className="poster" src={m.poster} alt={m.title} />
+                {rented && <div className="badge">เช่าแล้ว ✅</div>}
+              </div>
+
+              <div className="cardBody">
+                <div className="titleRow">
+                  <h3 className="title">{m.title}</h3>
+                </div>
+
+                <div className="meta">
+                  {m.year} • ⭐ {m.rating} • {m.type}
+                </div>
+
+                <div className="actions">
+                  <button className="btn" onClick={() => navigate(`/movie/${m.id}`)}>
+                    รายละเอียด
+                  </button>
+
+                  <button
+                    className={`btn ${rented ? "btnDisabled" : ""}`}
+                    onClick={() => rent(m.id)}
+                    disabled={rented}
+                    title={rented ? "เช่าแล้ว" : "เช่าหนัง"}
+                  >
+                    {rented ? "เช่าแล้ว" : "เช่า"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
-
-      <section className="moviesGrid">
-        {list.map((m) => (
-          <article
-            key={m.id}
-            className="movieCard"
-            role="button"
-            tabIndex={0}
-            onClick={() => navigate(`/movie/${m.id}`)}
-            onKeyDown={(e) => e.key === "Enter" && navigate(`/movie/${m.id}`)}
-          >
-            <div className="posterWrap">
-              <img src={m.poster} alt={m.title} loading="lazy" />
-
-              <div className="badgeLeft">{m.year}</div>
-              <div className="badgeRight">⭐ {m.rating}</div>
-            </div>
-
-            <div className="movieInfo">
-              <h3 className="movieTitle" title={m.title}>
-                {m.title}
-              </h3>
-              <p className="movieMeta">
-                {m.type} • {m.genre}
-              </p>
-            </div>
-          </article>
-        ))}
-      </section>
     </main>
   );
 }

@@ -2,55 +2,61 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Movies from "./pages/Movies";
-import Detail from "./pages/Detail"; // หรือ MovieDetail ก็ได้ แต่เลือกอันที่คุณใช้จริง
+import Detail from "./pages/Detail";
+import Library from "./pages/Library";
+import Login from "./pages/Login";
+
+import { RentalsProvider } from "./contexts/RentalsContext";
 
 export default function App() {
   return (
-    <Routes>
-      {/* ให้ "/" ไป login เสมอ */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
+    <RentalsProvider>
+      <Navbar />
 
-      {/* หน้า Login */}
-      <Route path="/login" element={<Login />} />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Navigate to="/home" replace />} />
 
-      {/* ทุกหน้าหลังบ้านต้องผ่าน guard */}
-      <Route element={<ProtectedRoute />}>
         <Route
           path="/home"
           element={
-            <>
-              <Navbar />
+            <ProtectedRoute>
               <Home />
-            </>
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/movies"
           element={
-            <>
-              <Navbar />
+            <ProtectedRoute>
               <Movies />
-            </>
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/movie/:id"
           element={
-            <>
-              <Navbar />
+            <ProtectedRoute>
               <Detail />
-            </>
+            </ProtectedRoute>
           }
         />
-      </Route>
 
-      {/* กันพิมพ์ path แปลก */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
+        <Route
+          path="/library"
+          element={
+            <ProtectedRoute>
+              <Library />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="*" element={<Navigate to="/home" replace />} />
+      </Routes>
+    </RentalsProvider>
   );
 }
