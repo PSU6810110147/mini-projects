@@ -1,43 +1,77 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Navbar() {
-  const { pathname } = useLocation();
   const navigate = useNavigate();
-
-  const isActive = (to) => pathname === to;
+  const { isLoggedIn, user, role, logout } = useAuth();
 
   const onLogout = () => {
-    localStorage.removeItem("token");
+    logout();
     navigate("/login", { replace: true });
   };
 
   return (
-    <header className="navbar">
+    <div className="navbar">
       <div className="nav-inner">
-        <div className="nav-left">
-          <Link to="/home" className="brand-title">
-            Mini-Project-Movie
-          </Link>
-
-          <div className="nav-center">
-            <Link className={`nav-link ${isActive("/home") ? "active" : ""}`} to="/home">
-              หน้าแรก
-            </Link>
-            <Link className={`nav-link ${isActive("/movies") ? "active" : ""}`} to="/movies">
-              ทั้งหมด
-            </Link>
-            <Link className={`nav-link ${isActive("/library") ? "active" : ""}`} to="/library">
-              คลังของฉัน
-            </Link>
-          </div>
+        {/* Left / Brand */}
+        <div className="nav-left" onClick={() => navigate("/home")}>
+          {/* ถ้าคุณมีโลโก้จริง ให้เปลี่ยน src ได้ */}
+          <img
+            className="brand-logo"
+            src="https://cdn-icons-png.flaticon.com/512/744/744922.png"
+            alt="logo"
+          />
+          <div className="brand-title">Mini-Project-Movie</div>
         </div>
 
+        {/* Center / Menu */}
+        <div className="nav-center">
+          <NavLink
+            to="/home"
+            className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+          >
+            หน้าแรก
+          </NavLink>
+
+          <NavLink
+            to="/movies"
+            className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+          >
+            ทั้งหมด
+          </NavLink>
+
+          {/* library: เข้าทั้ง user + admin */}
+          {isLoggedIn && (
+            <NavLink
+              to="/library"
+              className={({ isActive }) =>
+                "nav-link" + (isActive ? " active" : "")
+              }
+            >
+              คลังของฉัน
+            </NavLink>
+          )}
+        </div>
+
+        {/* Right / User */}
         <div className="nav-right">
-          <button className="btn" onClick={onLogout}>
-            ออกจากระบบ
-          </button>
+          {isLoggedIn ? (
+            <>
+              <span className="muted" style={{ fontSize: 13 }}>
+                {user?.name ?? user?.username} •{" "}
+                <b style={{ color: "white" }}>{role}</b>
+              </span>
+              <button className="btn" onClick={onLogout}>
+                ออกจากระบบ
+              </button>
+            </>
+          ) : (
+            <button className="btn primary" onClick={() => navigate("/login")}>
+              Login
+            </button>
+          )}
         </div>
       </div>
-    </header>
+    </div>
   );
 }

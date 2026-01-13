@@ -9,54 +9,61 @@ import Library from "./pages/Library";
 import Login from "./pages/Login";
 
 import { RentalsProvider } from "./contexts/RentalsContext";
+import { AuthProvider } from "./contexts/AuthContext";
 
 export default function App() {
   return (
-    <RentalsProvider>
-      <Navbar />
+    <AuthProvider>
+      <RentalsProvider>
+        <Navbar />
 
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Navigate to="/home" replace />} />
+        <Routes>
+          {/* Public */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Navigate to="/home" replace />} />
 
-        <Route
-          path="/home"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
+          {/* Protected */}
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/movies"
-          element={
-            <ProtectedRoute>
-              <Movies />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/movies"
+            element={
+              <ProtectedRoute>
+                <Movies />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/movie/:id"
-          element={
-            <ProtectedRoute>
-              <Detail />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/movie/:id"
+            element={
+              <ProtectedRoute>
+                <Detail />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/library"
-          element={
-            <ProtectedRoute>
-              <Library />
-            </ProtectedRoute>
-          }
-        />
+          {/* ตัวอย่าง: library ให้เข้าทั้ง user และ admin */}
+          <Route
+            path="/library"
+            element={
+              <ProtectedRoute allowedRoles={["user", "admin"]}>
+                <Library />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route path="*" element={<Navigate to="/home" replace />} />
-      </Routes>
-    </RentalsProvider>
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/home" replace />} />
+        </Routes>
+      </RentalsProvider>
+    </AuthProvider>
   );
 }

@@ -6,7 +6,7 @@ export const movies = [
     rating: 8.0,
     type: "Movies",
     genre: "Action",
-    poster: "https://image.tmdb.org/t/p/w500/uxzzxijgPIY7slzFvMotPv8wjKA.jpg", // ของเดิมคุณ
+    poster: "https://image.tmdb.org/t/p/w500/uxzzxijgPIY7slzFvMotPv8wjKA.jpg", 
     overview: "T’Challa returns home as king of Wakanda but finds his sovereignty challenged.", // ของเดิมคุณ
     trailerUrl: "https://youtu.be/xjDjIWPwcPU?si=obq6EdHiCiMvS5CX",
   },

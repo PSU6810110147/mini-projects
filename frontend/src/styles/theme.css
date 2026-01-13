@@ -789,3 +789,42 @@ html, body {
 @media (max-width: 960px){
   .detailStats{ grid-template-columns: 1fr; }
 }
+/* ===== Navbar ===== */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(180deg, #0b1020, #070b16);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: auto;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ===== Brand / Logo ===== */
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.brand-logo {
+  width: 34px;        /* ✅ ขนาดพอดี */
+  height: 34px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.brand-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+}
